@@ -1,7 +1,5 @@
 #!/bin/python3
 
-
-from pyngrok import ngrok, conf
 import os
 from time import sleep
 import random
@@ -30,6 +28,7 @@ def crearFile(name, content):
     tok.close()
 
 def region():
+    from pyngrok import ngrok, conf
     try:
 
         if conf.get_default().region:
@@ -53,12 +52,14 @@ def region():
         print("Opcion no valida")
         return region()
 
-
+def salir():
+    """Salir"""
+    return exit()
 
 class tunel:
     def __init__(self):
         self.instalado=True
-        self.config = conf.get_default().config_path="./ngrokconfig.yml"
+        
     
     def verifica(self):
         try:
@@ -83,23 +84,27 @@ class tunel:
     def install_ngrok(self):
         """INSTALAR NGROK"""
         print("INSTALANDO NGROK", end="")
-        try:
-            for i in range(0,10):
-                sleep(1)
-                print(".", end="")
-            os.system("pip install pyngrok > /dev/null 2>&1")
-            print("Ngrok instalado con exito")
-            sleep(3)
-            os.system("clear")
-            return menu()
-        except:
-            print("algo saloio mal")
-            self.instalado = False
+        
+        for i in range(0,10):
+            sleep(1)
+            print(".", end="")
+        os.system("!pip install pyngrok > /dev/null 2>&1")
+        print("Ngrok instalado con exito")
+        sleep(3)
+        os.system("clear")
+        tunel.verifica(self)
+        region()
+        return menu()
+        
 
     def iniciar_tunel(self):
+        
         """INICIAR TUNEL NGROK"""
+        tunel.verifica(self)
         try:
+            from pyngrok import ngrok, conf
             if self.instalado:
+                conf.get_default().config_path="./ngrokconfig.yml"
                 op_puerto = input("1:PUERTO ALEATORIO\n2:ELEGIR PUERTO\nSELECCIONA UNA OPCION:")
                 if op_puerto == "1":
                     portRandom=random.randint(500, 6000)
@@ -126,16 +131,20 @@ def menu():
 
     print(f"{green}—{fin}"*41, f"\n{barra}        instalador ngrok by @pes528       {fin}")
     print(f"{green}—{fin}"*41)
-    options = {"a)":tunnel.install_ngrok, "b)":tunnel.iniciar_tunel }
+    options = {"a)":tunnel.install_ngrok, "b)":tunnel.iniciar_tunel, "0)":salir }
     
     for opcion, funcion in options.items():
         
         print(f"{red}{opcion}{fin}", funcion.__doc__)
     op=input("\nopcion:")
     op=op+")"
-    me=options.get(op, None)
+    me=options.get(op)
     if me:
         me()
+    
+    
+    elif me == "exit":
+        quit()
     else:
       print("Elige una opcion valida")
       sleep(4)
@@ -143,7 +152,7 @@ def menu():
       return menu()  
         
 def main():
-    tunnel.verifica()      
+    menu()   
               
           
 if __name__ == "__main__":
