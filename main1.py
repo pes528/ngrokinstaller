@@ -4,7 +4,7 @@ import random
 try:
     from pyngrok import ngrok, conf
 except:
-    os.system("!pip install pyngrok > /dev/null 2>&1")
+    os.system("pip install pyngrok > /dev/null 2>&1")
     print("ngrok instalado con exito")
     from pyngrok import ngrok, conf
 
