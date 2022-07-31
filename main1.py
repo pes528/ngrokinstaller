@@ -121,6 +121,7 @@ def init_tunnel():
         re=REGIONES.get(regi)
         conf.get_default().region=re
         print("REGION SELECCIONADA CON EXITO")
+        puertos()
     
 def config():
     """< CAMBIAR CONFIGURACIONES"""
