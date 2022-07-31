@@ -114,14 +114,20 @@ def init_tunnel():
     for i, j in REGIONES.items():
         print(i, j)
     regi=input("ESCRIBE LA REGION [ejemplo(sa)]:  ")
+    
     if isNum(regi)==True and len(regi)>2:
         print("ERROR")
         init_tunnel()
     else:
         re=REGIONES.get(regi)
-        conf.get_default().region=re
-        print("REGION SELECCIONADA CON EXITO")
-        puertos()
+        if re:
+
+          conf.get_default().region=re
+          print("REGION SELECCIONADA CON EXITO")
+          puertos()
+        else:
+          print("region incorrecta")
+          init_tunnel()
     
 def config():
     """< CAMBIAR CONFIGURACIONES"""
