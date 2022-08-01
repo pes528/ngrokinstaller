@@ -15,8 +15,53 @@ red="\033[1;31m"
 finColor="\033[0m"
 #-------
 
+REGIONES={
+    
+    "us": "< United States",
+    "eu": "< Europe",
+    "ap": "< Asia",
+    "au": "< Australia",
+    "sa": "< South America",
+    "jp": "< Japan"
+}
+#CONFIGURACIONES EXTRAS
+def newToken():
+    """< CONFIGURAR TOKEN"""
+    print("INSERTA EL NUEVO TOKEN")
+    token=input("TOKEN: ")
+    creatoken(token)
+    print("TOKEN ALMACENADO CON EXITO")
 
+def newRegion():
+    """< CAMBIAR REGION"""
+    print("SELECCIONA UNA REGION")
+    for i, j in REGIONES.items():
+        print(i, j)
+    regi=input("ESCRIBE LA REGION [ejemplo(sa)]:  ")
+    
+    if isNum(regi)==True and len(regi)>2:
+        print("ERROR")
+        init_tunnel()
+    else:
+        re=REGIONES.get(regi)
+        if re:
 
+          conf.get_default().region=re
+          print("REGION SELECCIONADA CON EXITO")
+          time.sleep(3)
+          config()
+          
+        else:
+          print("region incorrecta")
+          config()
+    
+
+def volverMenu():
+    """< VOLVER AL MENU""" 
+    return menu()
+#FIN CONFIGURACIONES EXTRAS
+
+#funciones utilitarias
 def escribe(nombre, datoss):
     r=open(nombre, "w")
     r.write(datoss)
@@ -27,15 +72,7 @@ def lee():
     r.close()
     return (str(tok))
 
-REGIONES={
-    
-    "us": "< United States",
-    "eu": "< Europe",
-    "ap": "< Asia",
-    "au": "< Australia",
-    "sa": "< South America",
-    "jp": "< Japan"
-}
+
 def isNum(dato):
     try:
         str(dato)
@@ -49,10 +86,11 @@ def verifica():
     else:
         return False
 def creatoken(token):
+    
     to=open("ngrok_token", "w")
     to.write(token)
     to.close()
-
+#fin funciones utilitarias
 
 def fin():
     os.system("clear")
@@ -97,14 +135,14 @@ def puertos():
         print("TOKEN NO ENCONTRADO, VE A NGROK.COM Y COPIA EL TOKEN DE AUTENTICACION A CONTINUACION.")
         token=input("INSERTE EL TOKEN: ")
         creatoken(token)
-        print("TOKEN ALAMCENADO CON EXITO")
+        print("TOKEN ALMACENADO CON EXITO")
         ngrok.set_auth_token(lee())
         fin()
         
         
 
 
-
+#PRINCIPAL-----------------
 def init_tunnel():
 
     """< INICIAR TUNEL NGROK"""
@@ -117,6 +155,7 @@ def init_tunnel():
     
     if isNum(regi)==True and len(regi)>2:
         print("ERROR")
+        time.sleep(2)
         init_tunnel()
     else:
         re=REGIONES.get(regi)
@@ -126,23 +165,41 @@ def init_tunnel():
           print("REGION SELECCIONADA CON EXITO")
           puertos()
         else:
-          print("region incorrecta")
+          print("REGION INCORRECTA")
+          time.sleep(2)
           init_tunnel()
-    
+
+
+
 def config():
     """< CAMBIAR CONFIGURACIONES"""
+    print(f"{barra}       MENU DE CONFIGURACIONES       {finColor}")
+    opcionConfig = {"1)":newToken, "2)":newRegion, "0)": volverMenu}
+    for option, function in opcionConfig.items():
+        print(option, function.__doc__)
+    option=input("OPCION: ")
+    o=opcionConfig.get(option+")", None)
+    if o:
+        o()
+    else:
+        print("OPCION INCORRECTA")
+        config()
 
 def salir():
     """< SALIR"""
     print("FINALIZADO")
     os.system("clear")
     return exit()
+
+#FIN PRINCIPAL-----------------------------
+
+
 def menu():
-    print(f"{green}—{finColor}"*41, f"\n{barra}        instalador ngrok by @pes528       {finColor}")
+    print(f"{green}—{finColor}"*41, f"\n{barra}         NGROK MANAGER by @pes528       {finColor}")
     print(f"{green}—{finColor}"*41)
     options={"1)":init_tunnel, "2)":config, "0)": salir}
     for opcion, funcion in options.items():
-        print(opcion, f"{green}{funcion.__doc__}{finColor}")
+        print(opcion, f"{red}{funcion.__doc__}{finColor}")
     opt=input("OPCION: ")
     r=options.get(opt+")", None)
     if r:
