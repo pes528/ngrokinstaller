@@ -135,7 +135,8 @@ def puertos():
     os.system("clear")
     print("Verificando Token...", end="")
     for j in range(0,10):
-        print(".", end="")
+        time.sleep(1)
+        print(f"{red}.{finColor}", end="")
     
     if verifica() == True:
         print("TOKEN VERIFICADO CON EXITO")
@@ -143,7 +144,7 @@ def puertos():
         fin()
 
     else:
-        print("TOKEN NO ENCONTRADO, VE A NGROK.COM Y COPIA EL TOKEN DE AUTENTICACION A CONTINUACION.")
+        print("TOKEN NO ENCONTRADO\nVE A NGROK.COM Y COPIA EL TOKEN DE AUTENTICACION.")
         token=input("INSERTE EL TOKEN: ")
         creatoken(token)
         print("TOKEN ALMACENADO CON EXITO")
