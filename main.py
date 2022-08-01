@@ -14,7 +14,7 @@ green="\033[1;32m"
 red="\033[1;31m"
 finColor="\033[0m"
 #-------
-
+region=["us", "eu", "ap", "au", "sa", "jp"]
 REGIONES={
     
     "us": "< United States",
@@ -43,10 +43,10 @@ def newRegion():
         print("ERROR")
         init_tunnel()
     else:
-        re=REGIONES.get(regi)
-        if re:
+        
+        if regi in region:
 
-          conf.get_default().region=re
+          conf.get_default().region=regi
           print("REGION SELECCIONADA CON EXITO")
           time.sleep(3)
           config()
@@ -64,7 +64,7 @@ def volverMenu():
 #funciones utilitarias
 def escribe(nombre, datoss):
     r=open(nombre, "w")
-    r.write(datoss)
+    r.write(datoss+"\n")
     r.close()
 def lee():
     r=open("ngrok_token", "r")
@@ -75,7 +75,7 @@ def lee():
 
 def isNum(dato):
     try:
-        str(dato)
+        int(dato)
         return True
     except:
         return False
@@ -95,22 +95,32 @@ def creatoken(token):
 def fin():
     os.system("clear")
     print("SELECCIONA LOS PUERTOS")
+    ngrok.set_auth_token(lee())
     print("1 < Puerto automatico\n2 < Puerto personalizado\n0 < Volver")
     opcion=input("OPCION: ")
     if opcion == "1":
+        os.system("clear")
         ran=random.randint(500, 9001)
-        tun=ngrok.connect(ran, bind_tls=True)
-        print(f"TUNEL: {tun.get_tunnels()}")
-        escribe("tunnels.txt", tun)
-        print("DATOS GUARDADOS EN TUNELS.TXT")
+        tun=ngrok.connect(int(ran), bind_tls=True)
+        datos=f"{red}LINK NGROK{finColor}: {tun.public_url}\n{red}PUERTO ALEATORIO{finColor}: {ran}"
+        print(f"{red}LINK NGROK{finColor}: {tun.public_url}\n{red}PUERTO ALEATORIO{finColor}: {ran}")
+        escribe("tunnel.txt", datos)
+        print("DATOS GUARDADOS EN tunnel.txt\nPara cerrar el tunel ngrok, solo debes salir del programa con la opcion 0 en el menu")
+        input("PRECIONA 0 PARA VOLVER: ")
+        menu()
     elif opcion=="2":
-        op=int(input("ESCRIBE EL PUERTO: "))
-        if isNum(op)== False :
+        ngrok.set_auth_token(lee())
+        op=input("ESCRIBE EL PUERTO: ")
+        if isNum(op)== True :
 
-            tunelPer=ngrok.connect(op, bind_tls=True)
-            print(f"TUNEL: {tunelPer.get_tunnels()}")
-            escribe("tunnels.txt", tunelPer)
-            print("DATOS GUARDADOS EN TUNELS.TXT")
+            tunelPer=ngrok.connect(int(op), bind_tls=True)
+            os.system("clear")
+            datos=f"{red}LINK NGROK{finColor}: {tunelPer.public_url}\n{red}PUERTO SELECCIONADO{finColor}: {op}"
+            print(f"{red}LINK NGROK{finColor}: {tunelPer.public_url}\n{red}PUERTO SELECCIONADO{finColor}: {op}")
+            escribe("tunnel.txt", datos)
+            print("DATOS GUARDADOS EN tunel.txt\nPara cerrar el tunel ngrok, solo debes salir del programa con la opcion 0 en el menu")
+            input("PRECIONA 0 PARA VOLVER: ")
+            menu()
         else:
             print("PUERTO INCORRECTO")
             fin()
@@ -124,8 +134,9 @@ def fin():
 def puertos():
     os.system("clear")
     print("Verificando Token...", end="")
-    for i in range(0,10):
+    for j in range(0,10):
         print(".", end="")
+    
     if verifica() == True:
         print("TOKEN VERIFICADO CON EXITO")
         ngrok.set_auth_token(lee())
@@ -147,23 +158,24 @@ def init_tunnel():
 
     """< INICIAR TUNEL NGROK"""
     os.system("clear")
-    conf.get_default().conf_path="./ngrok_conf.yml"
+    
     print("SELECCIONA UNA REGION")
     for i, j in REGIONES.items():
         print(i, j)
     regi=input("ESCRIBE LA REGION [ejemplo(sa)]:  ")
     
-    if isNum(regi)==True and len(regi)>2:
+    if isNum(regi)==False and len(regi)>2:
         print("ERROR")
         time.sleep(2)
         init_tunnel()
     else:
-        re=REGIONES.get(regi)
-        if re:
+        
+        if regi in region:
 
-          conf.get_default().region=re
-          print("REGION SELECCIONADA CON EXITO")
-          puertos()
+
+            conf.get_default().region=regi
+            print("REGION SELECCIONADA CON EXITO")
+            puertos()
         else:
           print("REGION INCORRECTA")
           time.sleep(2)
@@ -173,6 +185,7 @@ def init_tunnel():
 
 def config():
     """< CAMBIAR CONFIGURACIONES"""
+    os.system("clear")
     print(f"{barra}       MENU DE CONFIGURACIONES       {finColor}")
     opcionConfig = {"1)":newToken, "2)":newRegion, "0)": volverMenu}
     for option, function in opcionConfig.items():
@@ -185,6 +198,30 @@ def config():
         print("OPCION INCORRECTA")
         config()
 
+def viewTunnels():
+    """< VER TÚNELES ABIERTOS"""
+    
+    if ngrok.get_tunnels():
+
+        for link in ngrok.get_tunnels():
+            print(link)
+            input(f"{red}PRECIONA 0 PARA VOLVER{finColor}: ")
+            time.sleep(2)
+            menu()
+                        
+    else:
+        print("NO HAY SERVICIOS ACTIVOS")
+        time.sleep(2)
+        menu()
+
+def ayuda():
+    """< AYUDA"""
+    os.system("clear")
+    print(f"{barra}         CONSEJOS            {finColor}\n\n1: Si copiaste mal el token, ngrok no funcionara")
+    print("2: No debes SALIR el script si ya iniciaste un tunel ngrok o el tunel se cerrara")
+    print("")
+    input("PRECIONA UNA TECLA PARA VOLVER ATRAS: ")
+    menu()
 def salir():
     """< SALIR"""
     print("FINALIZADO")
@@ -195,9 +232,10 @@ def salir():
 
 
 def menu():
-    print(f"{green}—{finColor}"*41, f"\n{barra}         NGROK MANAGER by @pes528       {finColor}")
+    os.system("clear")
+    print(f"{green}—{finColor}"*41, f"\n{barra}       MINI NGROK MANAGER by @pes528     {finColor}")
     print(f"{green}—{finColor}"*41)
-    options={"1)":init_tunnel, "2)":config, "0)": salir}
+    options={"1)":init_tunnel, "2)":config,"3)":viewTunnels,"4)":ayuda, "0)": salir}
     for opcion, funcion in options.items():
         print(opcion, f"{red}{funcion.__doc__}{finColor}")
     opt=input("OPCION: ")
@@ -212,4 +250,5 @@ def menu():
 
 if __name__ == "__main__":
     
+    conf.get_default().config_path="./ngrok_conf.yml"
     menu()
